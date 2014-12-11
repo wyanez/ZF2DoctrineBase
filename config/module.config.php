@@ -13,7 +13,7 @@ return array(
 
     //    'initializers' => array(
     //    ),
-    ),
+    //),
 
 
     //'view_manager' => array(
