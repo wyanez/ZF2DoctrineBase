@@ -23,9 +23,9 @@
     "require-dev": {
         "firephp/firephp-core": "dev-master"
     },
-    "suggests":{
-        "doctrine/doctrine-module": "0.9.*@dev",
-        "doctrine/doctrine-orm-module": "0.9.*@dev"
+    "suggest":{
+        "doctrine/doctrine-module": "DoctrineModule 0.9.*@dev",
+        "doctrine/doctrine-orm-module": "DoctrineORMModule 0.9.*@dev"
     },
     "autoload": {
         "psr-0": {
