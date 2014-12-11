@@ -2,7 +2,7 @@
 /**
  * ZF2DoctrineBase Module
  *
- * @link https://github.com/wryanez/ canonical source repository
+ * @link https://github.com/wryanez/ZF2DoctrineBase canonical source repository
  * @license http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -43,9 +43,18 @@ class Module implements
     public function getViewHelperConfig()
     {
         return array(
-            'factories' => array(
-
-            ),
+          'invokables' => array(
+            'renderFlashMessenger' =>'ZF2DoctrineBase\View\Helper\RenderFlashMessenger',
+            'renderLinkEdit' =>'ZF2DoctrineBase\View\Helper\RenderLinkEdit',
+            'renderLinkDelete' =>'ZF2DoctrineBase\View\Helper\RenderLinkDelete',
+            'renderLinkNew' =>'ZF2DoctrineBase\View\Helper\RenderLinkNew', 
+            'renderLinkBack' =>'ZF2DoctrineBase\View\Helper\RenderLinkBack', 
+            'renderButtonDelete' =>'ZF2DoctrineBase\View\Helper\RenderButtonDelete',
+            'renderErrorMessages' =>'ZF2DoctrineBase\View\Helper\RenderErrorMessages',
+            'renderTableHeaderList' =>'ZF2DoctrineBase\View\Helper\RenderTableHeaderList',
+            'myFormCollection' =>'ZF2DoctrineBase\View\Helper\MyFormCollection',
+            'renderFormElement' =>'ZF2DoctrineBase\View\Helper\RenderFormElement',
+          ),  
         );
     }
 
@@ -55,9 +64,8 @@ class Module implements
     public function getControllerPluginConfig()
     {
         return array(
-            'factories' => array(
-
-            ),
+            //'factories' => array(
+            //),
         );
     }
 
