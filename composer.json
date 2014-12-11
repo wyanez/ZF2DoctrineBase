@@ -1,0 +1,27 @@
+{
+    "name":         "wyanez/ZF2DoctrineBase",
+    "description":  "Zf2 + Doctrine Helper & Utilities Module",
+    "type":         "library",
+    "license":      "BSD-3-Clause",
+    "homepage":     "https://github.com/wyanez",
+    "keywords": [
+        "zf2"
+    ],
+    "authors": [
+        {
+            "name":      "William Yanez",
+            "email":     "wyanez@gmail.com",
+            "homepage":  "http://about.me/wryanez",
+            "role":      "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "ZF2DoctrineBase\\": "src/"
+        }
+    }
+}
