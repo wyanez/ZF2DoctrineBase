@@ -48,7 +48,7 @@ abstract class BaseDoctrineController extends AbstractActionController implement
     }
 
     protected function getLog(){
-        return $this->getServiceLocator()->get('Application\Log');
+        return $this->getServiceLocator()->get('ZF2DoctrineBase\Log');
     }
     
 }

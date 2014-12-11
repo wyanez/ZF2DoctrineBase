@@ -1,11 +1,11 @@
 {
     "name":         "wyanez/zf2-doctrine-base",
-    "description":  "Zf2 + Doctrine Helper & Utilities Module",
+    "description":  "Zf2 + Doctrine Base Class, View  Helper & Utilities Module",
     "type":         "library",
     "license":      "BSD-3-Clause",
     "homepage":     "https://github.com/wyanez/ZF2DoctrineBase",
     "keywords": [
-        "zf2","doctrine","helper"
+        "zf2","doctrine","helper","base","abstract"
     ],
     "authors": [
         {
@@ -17,7 +17,13 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.4",
+        "zendframework/zendframework": "2.3.*",
+        "doctrine/doctrine-module": "dev-master",
+        "doctrine/doctrine-orm-module": "dev-master"
+    },
+    "require-dev": {
+        "firephp/firephp-core": "dev-master"
     },
     "autoload": {
         "psr-0": {

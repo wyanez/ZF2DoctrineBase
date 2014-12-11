@@ -12,10 +12,17 @@ use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\ControllerPluginProviderInterface;
 use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
+use Zend\ModuleManager\Feature\ServiceProviderInterface;
+
 use Zend\Mvc\ApplicationInterface;
 
+use Zend\Log\Writer\FirePhp,
+    Zend\Log\Writer\FirePhp\FirePhpBridge,
+    Zend\Log\Writer\Stream,
+    Zend\Log\Logger,
+    Zend\Log\Filter\Priority;
+    
 /**
  * Base Module for ZF2DoctrineBase
  * @author William Yanez <wyanez@gmail.com>
@@ -25,8 +32,8 @@ class Module implements
     AutoloaderProviderInterface,
     BootstrapListenerInterface,
     ConfigProviderInterface,
-    ControllerPluginProviderInterface,
-    ViewHelperProviderInterface
+    ViewHelperProviderInterface,
+    ServiceProviderInterface
 {
     /**
      * {@inheritDoc}
@@ -58,16 +65,6 @@ class Module implements
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getControllerPluginConfig()
-    {
-        return array(
-            //'factories' => array(
-            //),
-        );
-    }
 
     /**
      * {@inheritDoc}
@@ -90,4 +87,34 @@ class Module implements
     {
         return include __DIR__ . '/../../config/module.config.php';
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'ZF2DoctrineBase\Log' => function ($sm) {
+                    $log = new Logger();
+                    $firephp_writer = new FirePhp(new FirePhpBridge(\FirePHP::getInstance(true)));
+                    $log->addWriter($firephp_writer);
+
+                    //Si no existe el directorio de log lo creamos
+                    $log_dir= getcwd().'/data/log/';
+                    if (!is_dir($log_dir)) mkdir($log_dir,0755,true);
+
+                    $stream_writer = new Stream($log_dir.'zf2doctrinebase-'.-date('Ymd').'.log');
+                    $log->addWriter($stream_writer);
+
+                    $filter = new Priority(Logger::INFO); //ToDo En producción cambiar a Logger::ERROR
+                    $stream_writer->addFilter($filter);
+
+                    $log->info('Logging enabled');
+                    return $log;
+                },
+            ),
+        );
+    }
+
 }
