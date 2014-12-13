@@ -18,14 +18,15 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4",
-        "zendframework/zendframework": "2.3.*"
-    },
-    "require-dev": {
-        "firephp/firephp-core": "dev-master"
+        "zendframework/zendframework": "2.3.*",
+        "eternicode/bootstrap-datepicker": "dev-master",
+        "ivaynberg/select2": "dev-master"
     },
     "suggest":{
-        "doctrine/doctrine-module": "DoctrineModule 0.9.*@dev",
-        "doctrine/doctrine-orm-module": "DoctrineORMModule 0.9.*@dev"
+        "doctrine/doctrine-module": "DoctrineModule",
+        "doctrine/doctrine-orm-module": "DoctrineORMModule",
+        "zendframework/zend-developer-tools": "zend-developer-tools",
+        "firephp/firephp-core": "dev-master"
     },
     "autoload": {
         "psr-0": {
