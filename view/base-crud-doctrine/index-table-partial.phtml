@@ -1,0 +1,46 @@
+<?php $url= $urlSort=$this->url($this->urlBase,array('controller'=>$this->urlController));?>
+<table class="table table-striped">
+<tr>
+    <?=$this->renderTableHeaderList($this->list_titles,$this->list_fields,$url,$this->arrSort)?>
+</tr>
+
+<?php 
+   $countRecords=0; 
+   foreach ($this->paginator as $reg){ 
+    $countRecords++;
+    if(is_array($this->campoPK)){
+        $arrAction=array('action'=>'edit','controller'=>$this->urlController,);
+        $arrFieldsPK=array();
+        foreach ($this->campoPK as $field) {
+            $arrFieldsPK[$field]=(string) $reg->$field; 
+        }
+        $arrUrlEdit=array_merge($arrAction,$arrFieldsPK);
+        $arrAction['action']='delete';
+        $arrUrlDel=array_merge($arrAction,$arrFieldsPK);    
+    } 
+    else{
+        $campoPk = $this->campoPK;    
+        $id=$reg->$campoPk;
+        $arrUrlEdit=array('controller'=>$this->urlController,'action'=>'edit',$campoPk=>$id);
+        $arrUrlDel=array('controller'=>$this->urlController,'action'=>'delete',$campoPk=>$id);
+    }
+    $url_edit=$this->url($this->urlBase,$arrUrlEdit);
+    $url_delete=$this->url($this->urlBase,$arrUrlDel);  
+?>    
+
+<tr>
+    <?php foreach ($this->list_fields as $field): 
+         $getter = 'get'. ucfirst($field);
+         if (is_bool($reg->$field) === true) $value = ($reg->$field === true) ? "Si":"No";
+         else $value= $reg->$getter();
+    ?>
+        <td><?= $value ?></td>
+    <?php endforeach; ?>
+    <td>
+        <?= $this->renderLinkEdit($url_edit); ?>
+        <?= $this->renderLinkDelete($url_delete); ?>
+    </td>
+</tr>
+<?php } //endforeach; ?>
+</table>
+<strong><?= $countRecords?></strong> Registros

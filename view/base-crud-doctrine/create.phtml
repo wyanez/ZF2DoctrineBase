@@ -1,0 +1,20 @@
+<?php
+    $this->headTitle($this->title);
+
+    $form->setAttribute('action',$this->url($this->urlBase, array('controller'=>$this->urlController,
+                                                                  'action' =>'create')
+                                            ));
+    $form->setAttribute('autocomplete','off');
+    $form->prepare();
+    
+    echo $this->partial($this->partialForm,
+                        array('form' => $form,
+                              'title'=>$this->title,
+                              'formFieldsWidth'=> $this->formFieldsWidth,
+                               'urlController' => $this->urlController,
+                               'formRequireDatePicker' =>$this->formRequireDatePicker,
+                               'formRequireSelect2' =>$this->formRequireSelect2,
+                               'formJsFile' =>$this->formJsFile,
+                              )
+                        );
+?>

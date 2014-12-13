@@ -52,4 +52,15 @@ class BaseDoctrineForm extends Form implements ObjectManagerAwareInterface
         //Implementacion vacia. Por defecto no hace nada
     }
 
+    /**
+    * Metodo que retorna un array con la distribucion de los Fieldsets en Tabs.
+    * Debe ser implementado por las subclases de BaseForm
+    * Ejemplo: return array('tab1'=>array('btn'=>array('btn1'),'fieldset'=>'fieldsetName1'),
+    *                       'tab1'=>array('btn'=>array('btn2','btn3'),'fieldset'=>'fieldsetName2')
+    *                       );_
+    */
+    public function getConfigViewFieldsets(){
+        return array();
+    }
+
 }

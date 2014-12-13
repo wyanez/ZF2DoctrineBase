@@ -1,0 +1,130 @@
+<?php 
+    $form->setAttribute('class' ,'form-horizontal');
+    $form->setAttribute('role' ,'form'); 
+?>
+<?= $this->renderFlashMessenger(); ?>
+
+<?= $this->form()->openTag($form); ?>
+<div class="panel panel-info">
+   <div class="panel-heading"><?=$this->escapeHtml($title)?></div>    
+   <div class="panel-body">
+ <?php  
+     $hayFieldset = !(is_null($this->form->getBaseFieldset()));
+     if($hayFieldset) $base=$this->form->getBaseFieldset(); 
+     else $base=$this->form;
+
+     foreach ($base->getElements() as $element){ 
+        $nameElement = $element->getName();
+        if ($hayFieldset){
+          preg_match('/^(.+)\[(.+)\]/',$nameElement,$coincidencias);
+          $name = $coincidencias[2];  
+        } 
+        else $name = $nameElement;
+        $widthElement = isset($formFieldsWidth[$name])? $formFieldsWidth[$name]: 8;
+
+        echo $this->renderFormElement($element,$widthElement);           
+     } //endforeach; 
+  ?>
+  <?php 
+      $hayCollection = false;
+      if ($this->form instanceof \Base\Form\BaseDoctrineForm){ 
+          $arrConfigFieldsets = $this->form->getConfigViewFieldsets();   
+          if(count($arrConfigFieldsets)>0){
+              $hayCollection = true;
+  ?>
+        <!--detalle -->
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <?php $i=1; 
+                 foreach ($arrConfigFieldsets as $tabLabel => $tabElements){ ?>
+                  <li <?=$i==1?'class="active"':''?>"><a href="#tab<?=$i?>" data-toggle="tab"><?=$tabLabel?></a></li>
+                 <?php $i++; } //foreach; ?> 
+            </ul>
+
+            <div class="tab-content">
+              <?php $i=1; 
+                 foreach ($arrConfigFieldsets as $tabLabel => $tabElements){ 
+              ?>
+                <div class="tab-pane <?=$i==1?'active':''?>" id="tab<?=$i?>" style="height: 200px; overflow: auto; margin-top: 20px;">     
+                    <?php foreach ($tabElements['btn'] as $btnName): ?>
+                       <?=$this->formElement($base->get($btnName)); ?>
+                    <?php endforeach; ?>
+                    
+                    <?php if(isset($tabElements['titulos'])): ?>
+                        <p/>
+                        <?php foreach ($tabElements['titulos'] as $titulo => $ancho): ?>
+                              <span class="titulo_detalle col-md-<?=$ancho?>"><?=$titulo?></span>
+                        <?php endforeach; ?>  
+                        <p/>
+                        <br/>
+                    <?php endif; ?>                  
+                    <?=$this->myFormCollection($base->get($tabElements['fieldset'])); ?>
+                  
+                </div>
+              <?php 
+                    $i++;
+                 } //foreach; ?> 
+           </div>
+        </div>
+       <?php   
+          } //endif; 
+        } //endif;
+   ?> 
+
+   </div>
+    <div class="panel-footer">
+     <?=$this->formSubmit($form->get('submit')); ?>
+     <?=$this->renderLinkBack($this->urlBase,$this->urlController); ?>
+     <?php if(isset($urlDelete)): ?>
+        <?=$this->renderButtonDelete($this->urlDelete); ?>
+     <?php endif; ?> 
+   </div>   
+</div>
+
+<?php if($form->has('csrf')): ?>
+    <?=$this->formHidden($form->get('csrf')); ?>
+<?php endif; ?> 
+
+<?= $this->renderErrorMessages($this->form); ?>
+
+<?= $this->form()->closeTag(); ?>
+
+<!-- Begin Catalogo Modal -->
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 class="modal-title" id="myModalLabel">Catalogo</h3>
+      </div>
+      <div class="modal-body" style="height: 150px; overflow:auto">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Catalogo Modal -->
+
+<?php 
+if ($this->formRequireDatePicker){
+    $this->headLink()->prependStylesheet($this->basePath().'/css/datepicker3.css');
+    $this->headScript()->prependFile($this->basePath().'/js/bootstrap-datepicker.js');
+    $this->headScript()->appendFile($this->basePath().'/js/bootstrap-datepicker.es.js');  
+}
+
+if($this->formRequireSelect2){
+  $this->headLink()->prependStylesheet($this->basePath().'/css/select2.css');
+  $this->headScript()->prependFile($this->basePath().'/js/select2_locale_es.js');
+  $this->headScript()->prependFile($this->basePath().'/js/select2.min.js');
+}
+
+if(!is_null($this->formJsFile)){
+    $this->headScript()->appendFile($this->basePath().'/js'.'/'.$this->formJsFile);   
+}
+
+if($hayCollection){
+  $this->headScript()->prependFile($this->basePath().'/js/form_collection_dynamic.js');
+}
+?>

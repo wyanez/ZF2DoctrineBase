@@ -1,0 +1,30 @@
+<?php
+    $this->headTitle($this->title);
+    
+    if(is_array($this->id)){
+         $arr1=array('controller'=>$this->urlController,'action'=>'edit');
+         $arrUrlEdit=array_merge($arr1,$this->id);    
+    }
+    else $arrUrlEdit=array('controller'=>$this->urlController,'action' =>'edit',$this->campoPK => $this->id);
+    
+    $url_edit=$this->url($this->urlBase,$arrUrlEdit);
+
+    $arrUrlEdit['action']='delete';
+    $url_delete=$this->url($this->urlBase,$arrUrlEdit);
+    
+    $form->setAttribute('action',$url_edit);
+    $form->setAttribute('autocomplete','off');
+    $form->prepare();
+    
+    echo $this->partial($this->partialForm,
+                        array('form' => $form,
+                              'title'=>$this->title,
+                              'formFieldsWidth'=> $this->formFieldsWidth,
+                              'urlDelete' =>$url_delete,
+                              'urlController' => $this->urlController,
+                              'formRequireDatePicker' =>$this->formRequireDatePicker,
+                              'formRequireSelect2' =>$this->formRequireSelect2,
+                              'formJsFile' =>$this->formJsFile,
+                              )
+                        );
+?>

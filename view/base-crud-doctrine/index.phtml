@@ -1,0 +1,117 @@
+<?php
+  $this->headTitle($this->title);
+  $url_new=$this->url($this->urlBase, array('controller'=>$this->urlController,'action'=>'create'));
+?>
+<?= $this->renderFlashMessenger() ?>
+
+<div class="panel panel-info">
+   <div class="panel-heading"><?=$this->escapeHtml($title)?></div>    
+   <div class="panel-body">
+
+  <div class="row">
+    <div class="col-md-2"><?= $this->renderLinkNew($url_new,'Agregar'); ?></div> 
+    <?php if(isset($form)): ?>
+       <div class="col-md-6"><?= $this->formHidden($form->get('buscador')); ?></div>
+       <?php if ($form->has('fecha')): ?>
+          <div class="input-group date col-md-2 col-md-offset-1" id="fecha">
+              <input type="text" class="form-control" id="fecha_input" value="<?= $form->get('fecha')->getValue()?>" title="Cambiar Fecha"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+          </div>
+       <?php endif; ?> 
+    <?php endif; ?>
+ </div>
+ <br/><br/>
+  <div>
+  <?= $this->partial($this->indexPartialTable,
+                      array(
+                        'paginator' => $this->paginator,
+                        'list_fields' => $this->list_fields,
+                        'list_titles' =>  $this->list_titles,
+                        'title' => $this->title,
+                        'campoPK' => $this->campoPK, 
+                        'urlBase' => $this->urlBase,
+                        'urlController' => $this->urlController,
+                        'arrSort' => $this->arrSort, 
+                      ));
+  ?>
+  </div>
+
+<?php
+//Se usa paginacion si no es PK Compuesta
+if(!is_array($this->campoPK)){
+  echo $this->paginationControl(
+      $this->paginator,
+      'sliding',
+      array('partial/paginator.phtml', 'ZF2DoctrineBase'),
+      array('route' => $this->url($this->urlBase, array('controller'=>$this->urlController)))
+  );
+}
+
+  $this->headLink()->prependStylesheet($this->basePath().'/css/select2.css');
+  $this->headScript()->prependFile($this->basePath().'/js/select2_locale_es.js');
+  $this->headScript()->prependFile($this->basePath().'/js/select2.min.js');
+
+  //DatePicker para Buscador con Fecha :
+  if (isset($form) && $form->has('fecha')){
+    $this->headLink()->prependStylesheet($this->basePath().'/css/datepicker.css');
+    $this->headScript()->prependFile($this->basePath().'/js/bootstrap-datepicker.js');  
+    $this->headScript()->appendFile($this->basePath().'/js/bootstrap-datepicker-es.js');  
+  }  
+ 
+?>
+  </div> <!--panel-body -->
+</div> <!--panel -->
+
+<?php 
+   $url_filter=$this->url($this->urlBase, array('controller'=>$this->urlController,'action'=>'filter')); 
+   if(is_array($this->campoPK)) $fieldFilter=$this->campoPK[0];
+   else $fieldFilter=$this->campoPK;
+?>
+<script>
+   $(document).ready(function() {
+      $('#buscador').select2({
+          placeholder: "Buscar...",
+          allowClear: true,
+          minimumInputLength: 1,
+          ajax: {
+              url: "<?= $url_filter ?>",
+              dataType: 'json',
+              data: function (term, page) {
+                  return { <?=$fieldFilter?>: term };
+              },
+              results: function (data, page) {
+                  return { results: data };
+              }
+          }
+      });
+      
+      $("#buscador").change(function() {
+        url_edit="<?= $this->url($this->urlBase,array('controller'=>$this->urlController,'action'=>'edit')) ?>/";
+        window.location.href =url_edit + $(this).val();
+      });
+
+    <?php if (isset($form) && $form->has('fecha')): ?>
+     var nowTemp = new Date();
+     var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+
+        $('#fecha').datepicker({ 
+          format: "dd-mm-yyyy",
+          autoclose : true,
+          orientation: "top",
+          language : "es",
+          endDate: now
+        })
+        .on('changeDate', function(ev){
+              var hoy=new Date();
+              var fecha = ev.date.valueOf();  
+              if (fecha > hoy.valueOf()){
+                 alert('La fecha debe ser menor  o igual a la fecha actual');
+              } else {
+                  var fechaStr = $('#fecha_input').val()
+                  url_index="<?= $this->url($this->urlBase,array('controller'=>$this->urlController)) ?>";
+                  window.location.href =url_index + '?fecha=' + fechaStr ;
+              }
+          });
+      <?php endif; ?>
+      console.log('Inicializacion Javascript Ok');
+  });
+</script>
