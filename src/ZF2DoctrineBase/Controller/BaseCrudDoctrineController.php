@@ -132,8 +132,7 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
                   $ok = $this->getModel()->save($this->entity);
                   if($ok){
                     $this->flashMessenger()->addMessage('Inclusion realizada Exitosamente!');
-                    $arrUrlEdit = $this->getUrlEdit();
-                    return $this->redirect()->toRoute($this->urlBase,$arrUrlEdit);
+                    return $this->redirect()->toRoute($this->urlBase,['controller'=>$this->urlController]);
                   }
               }
               if(!$ok){
@@ -182,7 +181,7 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
         }
         $this->flashMessenger()->addMessage($msg);
       }
-      return $this->redirect()->toRoute($this->urlBase,array('controller'=>$this->urlController));
+      return $this->redirect()->toRoute($this->urlBase,['controller'=>$this->urlController]);
     }
 
 
@@ -213,8 +212,7 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
                 $ok = $this->getModel()->save();
                 if($ok){
                     $this->flashMessenger()->addMessage('Modificacion Realizada Exitosamente');
-                    $arrUrlEdit = $this->getUrlEdit();
-                    return $this->redirect()->toRoute($this->urlBase,$arrUrlEdit);
+                    return $this->redirect()->toRoute($this->urlBase,['controller'=>$this->urlController]);
                  }
                  else{
                     $arr_msg = $this->getModel()->getErrorMessages();
@@ -303,23 +301,6 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
   protected function beforeShowEdit(){
   }
 
-
-  protected function getUrlEdit(){
-        if(is_array($this->campoPK)){
-            $arrAction=array('action'=>'edit','controller'=>$this->urlController,);
-            $arrFieldsPK=array();
-            foreach ($this->campoPK as $field) {
-                $arrFieldsPK[$field]=(string) $this->entity->$field;
-            }
-            $arrUrlEdit=array_merge($arrAction,$arrFieldsPK);
-        }
-        else{
-            $campoPk = $this->campoPK;
-            $id=$this->entity->$campoPk;
-            $arrUrlEdit=array('controller'=>$this->urlController,'action'=>'edit',$campoPk=>$id);
-        }
-        return $arrUrlEdit;
-    }
 
     //Patch agregado pq cuando la pk existe el entity tiene todos los campos en null
     // Problema con el DoctrineHydrator
