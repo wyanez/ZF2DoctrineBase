@@ -7,7 +7,7 @@ use Zend\View\Model\ViewModel;
 abstract class BaseCrudDoctrineController extends BaseDoctrineController{
 
   //Campos obligatorios que deben ser provistos por el desarrollador de las clases hijas
-  protected $campoPK;     // Array o String para indicar el nombre del/los campo(s) de la clave primaria de la entidad.
+  protected $campoPK;     //String para indicar el nombre del campo(s) de la clave primaria de la entidad.
   protected $urlBase;     // Identificador de la URL Base definida en module-config (usando child-routes)
 
   protected $entityFieldsIndex;  //Array de campos a mostrar en el Index
@@ -100,10 +100,10 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
  *  Este metodo se puede sobreescribir si se quieren agregar condiciones de filtro y otros aspectos
  */
   protected function getListDataToIndex($page,$fieldSort,$orderSort){
-        //Se usa paginacion si no es PK Compuesta
-        if(is_array($this->campoPK)) $lista_pag = $this->getModel()->listAll(); //TodDo Mejorar
-        else $lista_pag = $this->getModel()->listPaginate($page,$this->numRegistrosPagina,$fieldSort,$orderSort);
-
+        $lista_pag = $this->getModel()->listPaginate($page,
+                                                     $this->numRegistrosPagina,
+                                                     $fieldSort,
+                                                     $orderSort);
         return $lista_pag;
   }
 
@@ -114,9 +114,6 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
 
       $form = $this->getForm('Guardar');
       $form->bind($this->entity);
-
-      if(is_null($form->getBaseFieldset())) $base=$form;
-      else $base=$form->getBaseFieldset();
 
       $request = $this->getRequest();
       if ($request->isPost()){
@@ -131,29 +128,25 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
               if($ok){
                   $ok = $this->getModel()->save($this->entity);
                   if($ok){
-                    $this->flashMessenger()->addMessage('Inclusion realizada Exitosamente!');
-                    return $this->redirect()->toRoute($this->urlBase,['controller'=>$this->urlController]);
+                      $this->flashMessenger()->addMessage('Inclusion realizada Exitosamente!');
+                      return $this->redirectToIndex();
                   }
               }
-              if(!$ok){
-                  $arr_msg = $this->getModel()->getErrorMessages();
-
-                  if(is_array($this->campoPK)) $pkField=$this->campoPK[0];
-                  else $pkField=$this->campoPK;
-
-                  foreach ($arr_msg as $key => $msgArr) {
-                     if (($key!='pk')&& $base->has($key))
-                        $base->get($key)->setMessages($msgArr);
-                  }
-                  $base->get($pkField)->setMessages(array_merge($arr_msg[$pkField],$arr_msg['pk']));
-              }
+              if(!$ok) $this->setMessagesErrorModelToForm();
          }
       }
       // llama a un procedimiento definido por el usuario (opcional)
       $this->beforeShowCreate();
 
-      $this->viewModel->setVariables(
-          array('form' => $form,
+      $this->viewModel->setVariables($this->getVariablesToForm());
+      $this->viewModel->setTemplate(self::URL_BASE_VIEW.'create.phtml');
+      return $this->viewModel;
+    }
+
+    private function getVariablesToForm($id=null)
+    {
+        $arr=[  'campoPK' =>$this->campoPK,
+                'form' => $this->form,
                 'title' => $this->titlePage,
                 'urlBase' => $this->urlBase,
                 'urlController' => $this->urlController,
@@ -162,14 +155,14 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
                 'formRequireDatePicker' =>$this->formRequireDatePicker,
                 'formRequireSelect2' =>$this->formRequireSelect2,
                 'formJsFile' =>$this->formJsFile,
-          ));
-      $this->viewModel->setTemplate(self::URL_BASE_VIEW.'create.phtml');
-      return $this->viewModel;
+             ];
+        if(!is_null($id)) $arr['id']=$id;
+        return $arr;
     }
-
+                
     public function deleteAction(){
-      $id = $this->getParamsPK();
-      if(!isset($id)) return $this->redirect()->toRoute($this->urlBase,array('controller'=>$this->urlController));
+      $id = $this->params($this->campoPK);
+      if(!isset($id)) return $this->redirectToIndex();
 
       $this->entity = $this->getModel()->get($id); // obtengo la entidad
       if($this->entity){
@@ -177,33 +170,22 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
         if($ok) $msg = "Eliminacion realizada con Exito!";
         else{
             $arr_msg = $this->getModel()->getErrorMessages();
-            $msg = $arr_msg['pk'][0];
+            $msg = $arr_msg['id'][0];
         }
         $this->flashMessenger()->addMessage($msg);
       }
-      return $this->redirect()->toRoute($this->urlBase,['controller'=>$this->urlController]);
+      return $this->redirectToIndex();
     }
 
 
   public function editAction(){
-      $id = $this->getParamsPK();
-      if(!isset($id)) return $this->redirect()->toRoute($this->urlBase,array('controller'=>$this->urlController));
+      $id = $this->params($this->campoPK);
+      if(!isset($id)) return $this->redirectToIndex();
 
       $this->entity= $this->getModel()->get($id);
       $form = $this->getForm('Actualizar');
 
       if ($this->entity){
-          if(is_null($form->getBaseFieldset())) $base=$form;
-          else $base=$form->getBaseFieldset();
-
-          if (is_array($this->campoPK)){
-            foreach ($this->campoPK as $field) {
-              $base->get($field)->setAttribute('readonly','true');
-            }
-          }
-          else if ($base->has($this->campoPK))
-             $base->get($this->campoPK)->setAttribute('readonly','true');
-
           $form->bind($this->entity);
           $request = $this->getRequest();
           if($request->isPost()){
@@ -212,61 +194,26 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
                 $ok = $this->getModel()->save();
                 if($ok){
                     $this->flashMessenger()->addMessage('Modificacion Realizada Exitosamente');
-                    return $this->redirect()->toRoute($this->urlBase,['controller'=>$this->urlController]);
+                    return $this->redirectToIndex();
                  }
-                 else{
-                    $arr_msg = $this->getModel()->getErrorMessages();
-                    if(is_array($arr_msg[$this->campoPK]))
-                      $arrErr = array_merge($arr_msg[$this->campoPK],$arr_msg['pk']);
-                    else
-                      $arrErr = $arr_msg['pk'];
-                    $base->get($this->campoPK)->setMessages($arrErr);
-                }
+                 else $this->setMessagesErrorModelToForm();
             }
           }
       }
       $this->beforeShowEdit();
 
-      $this->viewModel->setVariables(
-          array('id' => $id,
-                'campoPK' =>$this->campoPK,
-                'form' => $form,
-                'title' => $this->titlePage,
-                'urlBase' => $this->urlBase,
-                'urlController' => $this->urlController,
-                'partialForm' =>$this->partialForm,
-                'formFieldsWidth'=> $this->formFieldsWidth,
-                'formRequireDatePicker' =>$this->formRequireDatePicker,
-                'formRequireSelect2' =>$this->formRequireSelect2,
-                'formJsFile' =>$this->formJsFile,
-      ));
+      $this->viewModel->setVariables(getVariablesToForm());
       $this->viewModel->setTemplate(self::URL_BASE_VIEW.'edit.phtml');
       return $this->viewModel;
   }
 
   public function filterAction(){
-      if(is_array($this->campoPK)) $fieldFilter=$this->campoPK[0];
-      else $fieldFilter=$this->campoPK;
-
-      $request = $this->getRequest();
-      $valueFilter = $request->getQuery($fieldFilter);
+      $valueFilter = $this->getRequest()->getQuery($this->campoPK);
       $arrResult=$this->getModel()->filterModel("%".$valueFilter."%");
 
       $response= $this->getResponse();
       $response->setContent(\Zend\Json\Json::encode($arrResult));
       return $response;
-  }
-
-  protected function getParamsPK(){
-      if (is_array($this->campoPK)){
-          $id=array();
-          foreach ($this->campoPK as $field) {
-              $value=$this->params($field);
-              $id[$field]=$value;
-          }
-      }
-      else $id =$this->params($this->campoPK);
-      return $id;
   }
 
   protected function getModel(){
@@ -310,18 +257,8 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
         //$this->doctrineDebug($form->getData());
         //$this->doctrineDebug($entity);
         $isNullEntity=false;
-        if(is_array($this->campoPK)){
-           foreach ($this->campoPK as $field) {
-             if(is_null($entity->$field)){
-                $isNullEntity=true;
-                break;
-             }
-           }
-        }
-        else{
-          $field=$this->campoPK;
-          if(is_null($entity->$field)) $isNullEntity=true;
-        }
+        $field=$this->campoPK;
+        if(is_null($entity->$field)) $isNullEntity=true;
 
         if($isNullEntity){
            $arrFields = $entity->getArrayProperties();
@@ -330,6 +267,25 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
         }
         //$this->doctrineDebug($dataForm);
         //$this->doctrineDebug($entity);
+    }
+
+    protected function redirectToIndex()
+    {
+        return $this->redirect()->toRoute($this->urlBase,['controller'=>$this->urlController]);
+    }
+
+    protected function setMessagesErrorModelToForm()
+    {
+      $arr_msg = $this->getModel()->getErrorMessages();
+      $pkField=$this->campoPK;
+      
+      if(is_null($this->form->getBaseFieldset())) $base=$this->form;
+      else $base=$this->form->getBaseFieldset();
+
+      foreach ($arr_msg as $key => $msgArr)
+         if ($base->has($key)) $base->get($key)->setMessages($msgArr);
+
+      //$base->get($pkField)->setMessages(array_merge($arr_msg[$pkField],$arr_msg['pk']));
     }
 }
 ?>

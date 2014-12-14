@@ -35,16 +35,13 @@
   ?>
   </div>
 
-<?php
-//Se usa paginacion si no es PK Compuesta
-if(!is_array($this->campoPK)){
+<?php 
   echo $this->paginationControl(
-      $this->paginator,
-      'sliding',
-      array('partial/paginator.phtml', 'ZF2DoctrineBase'),
-      array('route' => $this->url($this->urlBase, array('controller'=>$this->urlController)))
-  );
-}
+          $this->paginator,
+          'sliding',
+          array('partial/paginator.phtml', 'ZF2DoctrineBase'),
+          array('route' => $this->url($this->urlBase, array('controller'=>$this->urlController)))
+      );
 
   $this->headLink()->prependStylesheet($this->basePath().'/css/select2.css');
   //$this->headLink()->prependStylesheet($this->basePath().'/css/select2-bootstrap.css');
@@ -63,9 +60,9 @@ if(!is_array($this->campoPK)){
 </div> <!--panel -->
 
 <?php 
-   $url_filter=$this->url($this->urlBase, array('controller'=>$this->urlController,'action'=>'filter')); 
-   if(is_array($this->campoPK)) $fieldFilter=$this->campoPK[0];
-   else $fieldFilter=$this->campoPK;
+   $url_filter = $this->url($this->urlBase,['controller'=>$this->urlController,'action'=>'filter']); 
+   $url_edit   = $this->url($this->urlBase,['controller'=>$this->urlController,'action'=>'edit']);
+   $url_index  = $this->url($this->urlBase,['controller'=>$this->urlController])
 ?>
 <script>
    $(document).ready(function() {
@@ -77,7 +74,7 @@ if(!is_array($this->campoPK)){
               url: "<?= $url_filter ?>",
               dataType: 'json',
               data: function (term, page) {
-                  return { <?=$fieldFilter?>: term };
+                  return { id: term };
               },
               results: function (data, page) {
                   return { results: data };
@@ -86,13 +83,13 @@ if(!is_array($this->campoPK)){
       });
       
       $("#buscador").change(function() {
-        url_edit="<?= $this->url($this->urlBase,array('controller'=>$this->urlController,'action'=>'edit')) ?>/";
+        url_edit="<?= $url_edit ?>/";
         window.location.href =url_edit + $(this).val();
       });
 
     <?php if (isset($form) && $form->has('fecha')): ?>
-     var nowTemp = new Date();
-     var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+       var nowTemp = new Date();
+       var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
 
         $('#fecha').datepicker({ 
           format: "dd-mm-yyyy",
@@ -108,7 +105,7 @@ if(!is_array($this->campoPK)){
                  alert('La fecha debe ser menor  o igual a la fecha actual');
               } else {
                   var fechaStr = $('#fecha_input').val()
-                  url_index="<?= $this->url($this->urlBase,array('controller'=>$this->urlController)) ?>";
+                  url_index="<?= $url_index ?>";
                   window.location.href =url_index + '?fecha=' + fechaStr ;
               }
           });

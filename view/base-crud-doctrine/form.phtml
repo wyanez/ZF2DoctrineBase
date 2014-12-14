@@ -1,6 +1,7 @@
 <?php 
     $form->setAttribute('class' ,'form-horizontal');
     $form->setAttribute('role' ,'form'); 
+    $form->setAttribute('autocomplete','off');
 ?>
 <?= $this->renderFlashMessenger(); ?>
 
@@ -100,16 +101,15 @@ if ($this->formRequireDatePicker){
 
 if($this->formRequireSelect2){
   $this->headLink()->prependStylesheet($this->basePath().'/css/select2.css');
-  $this->headLink()->prependStylesheet($this->basePath().'/css/select2-bootstrap.css');
+  //$this->headLink()->prependStylesheet($this->basePath().'/css/select2-bootstrap.css');
   $this->headScript()->prependFile($this->basePath().'/js/select2_locale_es.js');
   $this->headScript()->prependFile($this->basePath().'/js/select2.min.js');
 }
 
-if(!is_null($this->formJsFile)){
+if(!is_null($this->formJsFile))
     $this->headScript()->appendFile($this->basePath().'/js'.'/'.$this->formJsFile);   
-}
 
-if($hayCollection){
+
+if($hayCollection)
   $this->headScript()->prependFile($this->basePath().'/js/form_collection_dynamic.js');
-}
 ?>

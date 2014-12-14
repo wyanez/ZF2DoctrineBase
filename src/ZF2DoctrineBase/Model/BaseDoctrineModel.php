@@ -77,11 +77,11 @@ abstract class BaseDoctrineModel implements ObjectManagerAwareInterface{
     private function process_exception_save($e){
         if((strpos($e->getMessage(),"SQLSTATE[23000]")===false) &&
            (strpos($e->getMessage(),"SQLSTATE [23000, 2627]")===false)){
-                $this->arr_msg['pk'][]=$e->getMessage();
+                $this->arr_msg['id'][]=$e->getMessage();
         }
         else{
             $msg = "ERROR AL INTENTAR GUARDAR : ".$e->getMessage();
-            $field = 'pk';
+            $field = 'id';
             //ToDo obtener el codigo en base a la PK
             if(!(strpos($e->getMessage(),"1062 Duplicate entry")===false)){
                 $posdospuntos= strrpos($e->getMessage(),':');
@@ -108,12 +108,10 @@ abstract class BaseDoctrineModel implements ObjectManagerAwareInterface{
 
         } catch (\Doctrine\DBAL\DBALException $e) {
             $ok=false;
-            if(strpos($e->getMessage(),"SQLSTATE[23000]:")===false){
-                $this->arr_msg['pk'][]=$e->getMessage();        
-            }
-            else{
-                $this->arr_msg['pk'][]="ERROR: Registro NO se puede eliminar, tiene registros asociados!";  
-            }
+            if(strpos($e->getMessage(),"SQLSTATE[23000]:")===false)
+                $this->arr_msg['id'][]=$e->getMessage();        
+            else
+                $this->arr_msg['id'][]="ERROR: Registro NO se puede eliminar, tiene registros asociados!";
         }
         return $ok; 
     }
@@ -124,7 +122,6 @@ abstract class BaseDoctrineModel implements ObjectManagerAwareInterface{
                 $this->arr_msg[$field]=array();
             }
         }
-        $this->arr_msg['pk']=array();
      }
 
      //Implementacion por defecto del metodo validate. Debe ser sobreescrito clases hijas

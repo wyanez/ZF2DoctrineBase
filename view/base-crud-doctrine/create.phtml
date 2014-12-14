@@ -4,7 +4,6 @@
     $form->setAttribute('action',$this->url($this->urlBase, array('controller'=>$this->urlController,
                                                                   'action' =>'create')
                                             ));
-    $form->setAttribute('autocomplete','off');
     $form->prepare();
     
     echo $this->partial($this->partialForm,
