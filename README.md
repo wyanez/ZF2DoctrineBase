@@ -15,8 +15,9 @@ Then add to module list 'Zf2DoctrineBase' to your config/application.config.php
 
 Contents
 --------
-* **ZF2DoctrineBase/Controller **
+* **ZF2DoctrineBase/Controller**
   + **BaseDoctrineController**: Base Class Controller Doctrine Based. 
+  + **BaseCrudDoctrineController**: Base Class CRUD Controller Doctrine Based. 
 * **ZF2DoctrineBase/Form** 
   + **BaseDoctrineForm**: Base Class Form Doctrine Based.
   + **MyFormHelper** : Methods to generate Form elements.
