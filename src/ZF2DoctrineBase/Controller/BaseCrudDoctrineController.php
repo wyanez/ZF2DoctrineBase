@@ -202,7 +202,7 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
       }
       $this->beforeShowEdit();
 
-      $this->viewModel->setVariables(getVariablesToForm());
+      $this->viewModel->setVariables($this->getVariablesToForm($id));
       $this->viewModel->setTemplate(self::URL_BASE_VIEW.'edit.phtml');
       return $this->viewModel;
   }
