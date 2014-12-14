@@ -82,13 +82,12 @@ abstract class BaseDoctrineModel implements ObjectManagerAwareInterface{
         else{
             $msg = "ERROR AL INTENTAR GUARDAR : ".$e->getMessage();
             $field = 'pk';
-
             //ToDo obtener el codigo en base a la PK
             if(!(strpos($e->getMessage(),"1062 Duplicate entry")===false)){
                 $posdospuntos= strrpos($e->getMessage(),':');
                 if(!($posdospuntos===false)){
-                    $auxstr = substr($e->getMessage(),$posdospuntos);
-                    preg_match_all("(\'[a-zA-Z]+\')", $auxstr,$matches);
+                    $auxstr = substr($e->getMessage(),$posdospuntos+1);
+                    preg_match_all("/\'[^']+\'/",$auxstr,$matches);                    
                     $field =str_replace("'", "", $matches[0][1]);
                     $value = $matches[0][0];
                     $msg="Error: Valor $value ya existe!";

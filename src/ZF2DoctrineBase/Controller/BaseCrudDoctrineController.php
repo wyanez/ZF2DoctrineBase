@@ -140,7 +140,7 @@ abstract class BaseCrudDoctrineController extends BaseDoctrineController{
                   $arr_msg = $this->getModel()->getErrorMessages();
 
                   if(is_array($this->campoPK)) $pkField=$this->campoPK[0];
-                  else $pkField="codigo";//$pkField=$this->campoPK;
+                  else $pkField=$this->campoPK;
 
                   foreach ($arr_msg as $key => $msgArr) {
                      if (($key!='pk')&& $base->has($key))
