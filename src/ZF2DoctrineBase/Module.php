@@ -96,20 +96,7 @@ class Module implements
         return array(
             'factories' => array(
                 'ZF2DoctrineBase\Log' => function ($sm) {
-                    $log = new Logger();
-                    $firephp_writer = new FirePhp(new FirePhpBridge(\FirePHP::getInstance(true)));
-                    $log->addWriter($firephp_writer);
-
-                    //Si no existe el directorio de log lo creamos
-                    $log_dir= getcwd().'/data/log/';
-                    if (!is_dir($log_dir)) mkdir($log_dir,0755,true);
-
-                    $stream_writer = new Stream($log_dir.'zf2doctrinebase-'.-date('Ymd').'.log');
-                    $log->addWriter($stream_writer);
-
-                    $filter = new Priority(Logger::INFO); //ToDo En producción cambiar a Logger::ERROR
-                    $stream_writer->addFilter($filter);
-
+                    $log=$this->createLog('zf2doctrinebase',Logger::INFO); //ToDo En producción cambiar a Logger::ERROR
                     $log->info('Logging enabled');
                     return $log;
                 },
@@ -117,4 +104,24 @@ class Module implements
         );
     }
 
+    private function createLog($filenamePrefix,$loggerLevel,$log_base_dir='/data/log/')
+    {
+        $log = new Logger();
+        if(class_exists("\\FirePHP")){
+            $firephp_writer = new FirePhp(new FirePhpBridge(\FirePHP::getInstance(true)));
+            $log->addWriter($firephp_writer);
+        }
+
+        //Si no existe el directorio de log lo creamos
+        $log_dir= getcwd().$log_base_dir;
+        if (!is_dir($log_dir)) mkdir($log_dir,0755,true);
+
+        $stream_writer = new Stream($log_dir.$filenamePrefix.'-'.-date('Ymd').'.log');
+        $log->addWriter($stream_writer);
+
+        $filter = new Priority($loggerLevel); 
+        $stream_writer->addFilter($filter);
+
+        return $log;
+    }
 }
