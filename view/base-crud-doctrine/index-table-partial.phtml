@@ -1,9 +1,11 @@
 <?php $url= $urlSort=$this->url($this->urlBase,['controller'=>$this->urlController]);?>
-<table class="table table-striped">
+<table class="table table-condensed table-hover">
+<thead>
 <tr>
     <?=$this->renderTableHeaderList($this->list_titles,$this->list_fields,$url,$this->arrSort)?>
 </tr>
-
+</thead>
+<tbody>
 <?php 
    $countRecords=0; 
    foreach ($this->paginator as $reg){ 
@@ -31,5 +33,5 @@
             </td>
         </tr>
 <?php } //endforeach; ?>
+</tbody>
 </table>
-<strong><?= $countRecords?></strong> Registros
