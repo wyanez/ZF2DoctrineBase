@@ -47,6 +47,7 @@ if(!is_array($this->campoPK)){
 }
 
   $this->headLink()->prependStylesheet($this->basePath().'/css/select2.css');
+  $this->headLink()->prependStylesheet($this->basePath().'/css/select2-bootstrap.css');
   $this->headScript()->prependFile($this->basePath().'/js/select2_locale_es.js');
   $this->headScript()->prependFile($this->basePath().'/js/select2.min.js');
 
