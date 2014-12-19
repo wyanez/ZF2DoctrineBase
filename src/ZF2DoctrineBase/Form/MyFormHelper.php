@@ -9,7 +9,7 @@ namespace ZF2DoctrineBase\Form;
 class MyFormHelper
 {
   
-    public static function getElementText($nameElement,$label='',$widthElement=0,$widthLabel=2,$idElement=null){
+    public static function getElementText($nameElement,$label='',$widthElement=0,$widthLabel=2,$required=false,$idElement=null){
         $element = array(
                 'type' => 'Text',
                 'name' => $nameElement,
@@ -22,6 +22,28 @@ class MyFormHelper
             );
         if($widthElement>0) $element['attributes']['maxlength'] = $widthElement;
         if (!is_null($idElement)) $element['attributes']['id']= $idElement;
+        if($required) $element['attributes']['required'] = 'true';
+
+        return $element;
+    }
+
+    public static function getElementNumber($nameElement,$label='',$widthLabel=2,$required=false,$step=1,$min=0,$max=null,$idElement=null){
+        $element = array(
+                'type' => 'Number',
+                'name' => $nameElement,
+                'options' => array('label' => $label,
+                                   'label_attributes' => array('class'  => "col-md-$widthLabel control-label"),
+                                  ), 
+                'attributes' =>array(
+                    'class' => 'form-control',
+                    'step'=> $step,
+                    'min' => $min,
+                )
+        );
+        if (!is_null($idElement)) $element['attributes']['id']= $idElement;
+        if (!is_null($max)) $element['attributes']['max']= $idElement;
+        if($required) $element['attributes']['required'] = 'true';
+        
         return $element;
     }
 
